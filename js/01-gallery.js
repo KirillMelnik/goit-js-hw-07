@@ -1,3 +1,4 @@
+// import basicLightbox from '.basiclightbox.js';
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
@@ -25,26 +26,27 @@ function onRanderGalleryMarkup(elems) {
     .join(' ');
 }
 
-galleryContainerRef.addEventListener('click', onSelectedImg);
+galleryContainerRef.addEventListener('click', onShowImg);
 
-function onSelectedImg(evt) {
-  if (!evt.target.classList.contains('gallery__image')) {
-    return;
-  }
-  evt.preventDefault();
+const instance = basicLightbox.create('<img src =""/>', {
+  onShow: () => {
+    window.addEventListener('keydown', onCloseModal);
+  },
 
-  const selectImage = basicLightbox.create(`<img src="${evt.target.dataset.source}">`, {
-    onclose: () => {
-      document.removeEventListener('keydown', onCloseModal);
-    },
-  });
-  selectImage.show();
+  onClose: () => {
+    window.removeEventListener('keydown', onCloseModal);
+  },
+});
 
-  document.addEventListener('keydown', onCloseModal);
+function onShowImg(event) {
+  event.preventDefault();
+  instance.element().querySelector('img').src = event.target.dataset.source;
+  instance.show();
+}
 
-  function onCloseModal(evt) {
-    if (evt.key === 'Escape') {
-      selectImage.close();
-    }
+function onCloseModal(event) {
+  console.log(event);
+  if (event.key === 'Escape') {
+    return instance.close();
   }
 }
